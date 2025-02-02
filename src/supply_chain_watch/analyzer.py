@@ -22,3 +22,21 @@ SUSPICIOUS_SCRIPT_PATTERNS: list[tuple[re.Pattern[str], str, Severity]] = [
 ]
 
 LIFECYCLE_SCRIPTS = {"preinstall", "install", "postinstall", "prepare", "prepublish", "prepublishOnly"}
+
+
+def load_snapshot_file(path: str | Path) -> list[PackageSnapshot]:
+    """Load one or more package snapshots from a JSON file.
+
+    Accepted formats:
+    - a single package object
+    - a list of package objects
+    - an object with a "packages" list
+    """
+    file_path = Path(path)
+    raw_text = file_path.read_text(encoding="utf-8")
+    try:
+        data = json.loads(raw_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON in {file_path}: {exc}") from exc
+
+    items: Any
