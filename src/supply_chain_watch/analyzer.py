@@ -40,3 +40,20 @@ def load_snapshot_file(path: str | Path) -> list[PackageSnapshot]:
         raise ValueError(f"invalid JSON in {file_path}: {exc}") from exc
 
     items: Any
+    if isinstance(data, dict) and "packages" in data:
+        items = data["packages"]
+        if not isinstance(items, list):
+            raise ValueError(f"{file_path}: 'packages' must be a list")
+    elif isinstance(data, list):
+        items = data
+    elif isinstance(data, dict):
+        items = [data]
+    else:
+        raise ValueError(f"{file_path}: expected object or list of package snapshots")
+
+    snapshots: list[PackageSnapshot] = []
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            raise ValueError(f"{file_path}: package at index {index} must be an object")
+        snapshots.append(PackageSnapshot.from_dict(item, source=str(file_path)))
+    return snapshots
