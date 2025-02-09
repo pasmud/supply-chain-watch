@@ -57,3 +57,19 @@ def load_snapshot_file(path: str | Path) -> list[PackageSnapshot]:
             raise ValueError(f"{file_path}: package at index {index} must be an object")
         snapshots.append(PackageSnapshot.from_dict(item, source=str(file_path)))
     return snapshots
+
+
+def _maintainer_identities(snapshot: PackageSnapshot) -> set[str]:
+    identities: set[str] = set()
+    for maintainer in snapshot.maintainers:
+        email = maintainer.get("email", "").strip().lower()
+        name = maintainer.get("name", "").strip().lower()
+        if email:
+            identities.add(f"email:{email}")
+        elif name:
+            identities.add(f"name:{name}")
+    return identities
+
+
+def _script_findings(snapshot: PackageSnapshot) -> list[Finding]:
+    findings: list[Finding] = []
