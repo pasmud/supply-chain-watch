@@ -73,3 +73,34 @@ def _maintainer_identities(snapshot: PackageSnapshot) -> set[str]:
 
 def _script_findings(snapshot: PackageSnapshot) -> list[Finding]:
     findings: list[Finding] = []
+    for script_name, command in snapshot.scripts.items():
+        lifecycle = script_name in LIFECYCLE_SCRIPTS
+        for pattern, description, base_severity in SUSPICIOUS_SCRIPT_PATTERNS:
+            if not pattern.search(command):
+                continue
+            severity = base_severity
+            if lifecycle and severity.rank < Severity.HIGH.rank:
+                severity = Severity.HIGH
+            findings.append(
+                Finding(
+                    rule_id="SUSPICIOUS_SCRIPT",
+                    severity=severity,
+                    package=snapshot.name,
+                    message=(
+                        f"Suspicious script '{script_name}' contains {description}"
+                        + (" in lifecycle hook" if lifecycle else "")
+                    ),
+                    details={
+                        "script": script_name,
+                        "command": command,
+                        "pattern": description,
+                        "lifecycle": lifecycle,
+                    },
+                )
+            )
+    return findings
+
+
+def _metadata_completeness_findings(snapshot: PackageSnapshot) -> list[Finding]:
+    findings: list[Finding] = []
+    missing: list[str] = []
