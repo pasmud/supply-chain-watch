@@ -104,3 +104,19 @@ def _script_findings(snapshot: PackageSnapshot) -> list[Finding]:
 def _metadata_completeness_findings(snapshot: PackageSnapshot) -> list[Finding]:
     findings: list[Finding] = []
     missing: list[str] = []
+    if not snapshot.repository:
+        missing.append("repository")
+    if not snapshot.license:
+        missing.append("license")
+    if not snapshot.maintainers:
+        missing.append("maintainers")
+    if missing:
+        findings.append(
+            Finding(
+                rule_id="MISSING_METADATA",
+                severity=Severity.LOW,
+                package=snapshot.name,
+                message=f"Package metadata missing fields: {', '.join(missing)}",
+                details={"missing_fields": missing},
+            )
+        )
