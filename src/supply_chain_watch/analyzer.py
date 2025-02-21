@@ -120,3 +120,13 @@ def _metadata_completeness_findings(snapshot: PackageSnapshot) -> list[Finding]:
                 details={"missing_fields": missing},
             )
         )
+    return findings
+
+
+def scan_snapshot(snapshots: list[PackageSnapshot]) -> ScanReport:
+    """Scan snapshots for indicators that do not require a baseline."""
+    report = ScanReport(packages_scanned=[s.name for s in snapshots])
+    for snapshot in snapshots:
+        report.findings.extend(_script_findings(snapshot))
+        report.findings.extend(_metadata_completeness_findings(snapshot))
+    report.findings.sort(key=lambda f: (-f.severity.rank, f.package, f.rule_id, f.message))
