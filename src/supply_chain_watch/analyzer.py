@@ -130,3 +130,24 @@ def scan_snapshot(snapshots: list[PackageSnapshot]) -> ScanReport:
         report.findings.extend(_script_findings(snapshot))
         report.findings.extend(_metadata_completeness_findings(snapshot))
     report.findings.sort(key=lambda f: (-f.severity.rank, f.package, f.rule_id, f.message))
+    return report
+
+
+def _diff_maintainers(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
+    old = _maintainer_identities(baseline)
+    new = _maintainer_identities(current)
+    if not old or old == new:
+        if old and old == new:
+            return []
+        # no baseline maintainers -> cannot assert change, but current missing handled elsewhere
+        if old and not new:
+            return [
+                Finding(
+                    rule_id="MAINTAINERS_REMOVED",
+                    severity=Severity.HIGH,
+                    package=current.name,
+                    message="All maintainers were removed from package metadata",
+                    details={"previous": sorted(old), "current": []},
+                )
+            ]
+        return []
