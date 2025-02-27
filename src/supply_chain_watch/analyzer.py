@@ -151,3 +151,17 @@ def _diff_maintainers(baseline: PackageSnapshot, current: PackageSnapshot) -> li
                 )
             ]
         return []
+    added = sorted(new - old)
+    removed = sorted(old - new)
+    findings: list[Finding] = []
+    if removed and not new:
+        findings.append(
+            Finding(
+                rule_id="MAINTAINERS_REMOVED",
+                severity=Severity.HIGH,
+                package=current.name,
+                message="All maintainers were removed from package metadata",
+                details={"previous": sorted(old), "current": []},
+            )
+        )
+        return findings
