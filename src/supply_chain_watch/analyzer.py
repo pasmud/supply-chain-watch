@@ -165,3 +165,20 @@ def _diff_maintainers(baseline: PackageSnapshot, current: PackageSnapshot) -> li
             )
         )
         return findings
+    if added or removed:
+        severity = Severity.HIGH if removed else Severity.MEDIUM
+        findings.append(
+            Finding(
+                rule_id="MAINTAINER_CHANGE",
+                severity=severity,
+                package=current.name,
+                message="Maintainer identities changed between snapshots",
+                details={"added": added, "removed": removed},
+            )
+        )
+    return findings
+
+
+def _diff_dependencies(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
+    findings: list[Finding] = []
+    old = baseline.dependencies
