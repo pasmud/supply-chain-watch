@@ -182,3 +182,18 @@ def _diff_maintainers(baseline: PackageSnapshot, current: PackageSnapshot) -> li
 def _diff_dependencies(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
     findings: list[Finding] = []
     old = baseline.dependencies
+    new = current.dependencies
+    added = sorted(set(new) - set(old))
+    removed = sorted(set(old) - set(new))
+    changed = sorted(name for name in set(old) & set(new) if old[name] != new[name])
+
+    for name in added:
+        findings.append(
+            Finding(
+                rule_id="DEPENDENCY_ADDED",
+                severity=Severity.MEDIUM,
+                package=current.name,
+                message=f"Dependency added: {name} {new[name]}".rstrip(),
+                details={"dependency": name, "version": new[name]},
+            )
+        )
