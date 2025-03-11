@@ -197,3 +197,35 @@ def _diff_dependencies(baseline: PackageSnapshot, current: PackageSnapshot) -> l
                 details={"dependency": name, "version": new[name]},
             )
         )
+    for name in removed:
+        findings.append(
+            Finding(
+                rule_id="DEPENDENCY_REMOVED",
+                severity=Severity.LOW,
+                package=current.name,
+                message=f"Dependency removed: {name} {old[name]}".rstrip(),
+                details={"dependency": name, "previous_version": old[name]},
+            )
+        )
+    for name in changed:
+        findings.append(
+            Finding(
+                rule_id="DEPENDENCY_CHANGED",
+                severity=Severity.MEDIUM,
+                package=current.name,
+                message=f"Dependency version changed: {name} {old[name]!r} -> {new[name]!r}",
+                details={"dependency": name, "previous": old[name], "current": new[name]},
+            )
+        )
+    return findings
+
+
+def _diff_simple_field(
+    baseline: PackageSnapshot,
+    current: PackageSnapshot,
+    field: str,
+    rule_id: str,
+    severity: Severity,
+    label: str,
+) -> list[Finding]:
+    old = getattr(baseline, field)
