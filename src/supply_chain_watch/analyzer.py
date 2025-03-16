@@ -229,3 +229,19 @@ def _diff_simple_field(
     label: str,
 ) -> list[Finding]:
     old = getattr(baseline, field)
+    new = getattr(current, field)
+    if not old or not new or old == new:
+        return []
+    return [
+        Finding(
+            rule_id=rule_id,
+            severity=severity,
+            package=current.name,
+            message=f"{label} changed: {old!r} -> {new!r}",
+            details={"previous": old, "current": new},
+        )
+    ]
+
+
+def _diff_scripts(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
+    findings: list[Finding] = []
