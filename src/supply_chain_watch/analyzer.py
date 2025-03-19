@@ -245,3 +245,34 @@ def _diff_simple_field(
 
 def _diff_scripts(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
     findings: list[Finding] = []
+    old = baseline.scripts
+    new = current.scripts
+    for name in sorted(set(new) - set(old)):
+        lifecycle = name in LIFECYCLE_SCRIPTS
+        findings.append(
+            Finding(
+                rule_id="SCRIPT_ADDED",
+                severity=Severity.HIGH if lifecycle else Severity.MEDIUM,
+                package=current.name,
+                message=f"Script added: {name}" + (" (lifecycle hook)" if lifecycle else ""),
+                details={"script": name, "command": new[name], "lifecycle": lifecycle},
+            )
+        )
+    for name in sorted(set(old) & set(new)):
+        if old[name] == new[name]:
+            continue
+        lifecycle = name in LIFECYCLE_SCRIPTS
+        findings.append(
+            Finding(
+                rule_id="SCRIPT_CHANGED",
+                severity=Severity.HIGH if lifecycle else Severity.MEDIUM,
+                package=current.name,
+                message=f"Script changed: {name}" + (" (lifecycle hook)" if lifecycle else ""),
+                details={
+                    "script": name,
+                    "previous": old[name],
+                    "current": new[name],
+                    "lifecycle": lifecycle,
+                },
+            )
+        )
