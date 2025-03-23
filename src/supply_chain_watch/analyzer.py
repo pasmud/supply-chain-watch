@@ -276,3 +276,13 @@ def _diff_scripts(baseline: PackageSnapshot, current: PackageSnapshot) -> list[F
                 },
             )
         )
+    return findings
+
+
+def compare_snapshots(baseline: PackageSnapshot, current: PackageSnapshot) -> list[Finding]:
+    """Compare two snapshots of the same package and return findings."""
+    if baseline.name != current.name:
+        raise ValueError(
+            f"snapshot name mismatch: baseline={baseline.name!r}, current={current.name!r}"
+        )
+    findings: list[Finding] = []
