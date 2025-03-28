@@ -286,3 +286,16 @@ def compare_snapshots(baseline: PackageSnapshot, current: PackageSnapshot) -> li
             f"snapshot name mismatch: baseline={baseline.name!r}, current={current.name!r}"
         )
     findings: list[Finding] = []
+    findings.extend(_diff_maintainers(baseline, current))
+    findings.extend(_diff_dependencies(baseline, current))
+    findings.extend(_diff_scripts(baseline, current))
+    findings.extend(
+        _diff_simple_field(
+            baseline, current, "repository", "REPOSITORY_CHANGED", Severity.HIGH, "Repository URL"
+        )
+    )
+    findings.extend(
+        _diff_simple_field(
+            baseline, current, "homepage", "HOMEPAGE_CHANGED", Severity.MEDIUM, "Homepage URL"
+        )
+    )
