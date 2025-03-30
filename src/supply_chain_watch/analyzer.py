@@ -299,3 +299,23 @@ def compare_snapshots(baseline: PackageSnapshot, current: PackageSnapshot) -> li
             baseline, current, "homepage", "HOMEPAGE_CHANGED", Severity.MEDIUM, "Homepage URL"
         )
     )
+    findings.extend(
+        _diff_simple_field(
+            baseline, current, "license", "LICENSE_CHANGED", Severity.MEDIUM, "License"
+        )
+    )
+    findings.extend(
+        _diff_simple_field(
+            baseline, current, "version", "VERSION_CHANGED", Severity.LOW, "Version"
+        )
+    )
+    return findings
+
+
+def analyze_snapshots(
+    current_snapshots: list[PackageSnapshot],
+    baseline_snapshots: list[PackageSnapshot] | None = None,
+    baseline_source: str | None = None,
+    current_source: str | None = None,
+) -> ScanReport:
+    """Analyze current snapshots, optionally comparing against a baseline."""
