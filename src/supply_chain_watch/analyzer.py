@@ -319,3 +319,42 @@ def analyze_snapshots(
     current_source: str | None = None,
 ) -> ScanReport:
     """Analyze current snapshots, optionally comparing against a baseline."""
+    report = ScanReport(
+        packages_scanned=[s.name for s in current_snapshots],
+        baseline_source=baseline_source,
+        current_source=current_source,
+    )
+
+    # Single-snapshot checks (always run on current)
+    for snapshot in current_snapshots:
+        report.findings.extend(_script_findings(snapshot))
+        report.findings.extend(_metadata_completeness_findings(snapshot))
+
+    if baseline_snapshots is not None:
+        baseline_by_name = {s.name: s for s in baseline_snapshots}
+        current_by_name = {s.name: s for s in current_snapshots}
+
+        for name in sorted(set(current_by_name) - set(baseline_by_name)):
+            report.findings.append(
+                Finding(
+                    rule_id="NEW_PACKAGE",
+                    severity=Severity.MEDIUM,
+                    package=name,
+                    message=f"Package appears in current snapshot but not baseline: {name}",
+                    details={"name": name},
+                )
+            )
+        for name in sorted(set(baseline_by_name) - set(current_by_name)):
+            report.findings.append(
+                Finding(
+                    rule_id="PACKAGE_REMOVED",
+                    severity=Severity.LOW,
+                    package=name,
+                    message=f"Package present in baseline but missing from current snapshot: {name}",
+                    details={"name": name},
+                )
+            )
+        for name in sorted(set(baseline_by_name) & set(current_by_name)):
+            report.findings.extend(compare_snapshots(baseline_by_name[name], current_by_name[name]))
+
+    report.findings.sort(key=lambda f: (-f.severity.rank, f.package, f.rule_id, f.message))
