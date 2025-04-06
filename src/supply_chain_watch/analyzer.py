@@ -358,3 +358,4 @@ def analyze_snapshots(
             report.findings.extend(compare_snapshots(baseline_by_name[name], current_by_name[name]))
 
     report.findings.sort(key=lambda f: (-f.severity.rank, f.package, f.rule_id, f.message))
+    return report
