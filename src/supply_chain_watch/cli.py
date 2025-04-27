@@ -58,3 +58,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     return parser
+
+
+def _load_or_error(path: str) -> tuple[list, str | None]:
+    try:
+        return load_snapshot_file(path), None
+    except (OSError, ValueError) as exc:
+        return [], str(exc)
+
+
+def cmd_scan(args: argparse.Namespace) -> int:
+    errors: list[str] = []
+
+    current_snapshots, err = _load_or_error(args.current)
+    if err:
+        errors.append(err)
+
+    baseline_snapshots = None
+    if args.baseline:
+        baseline_snapshots, err = _load_or_error(args.baseline)
+        if err:
+            errors.append(err)
