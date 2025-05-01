@@ -79,3 +79,37 @@ def cmd_scan(args: argparse.Namespace) -> int:
         baseline_snapshots, err = _load_or_error(args.baseline)
         if err:
             errors.append(err)
+
+    if errors and not current_snapshots:
+        # Cannot produce a meaningful report without current data.
+        message = "; ".join(errors)
+        if args.format == "json":
+            sys.stdout.write(json.dumps({"error": message, "errors": errors}) + "\n")
+        else:
+            sys.stderr.write(f"error: {message}\n")
+        return 1
+
+    report = analyze_snapshots(
+        current_snapshots=current_snapshots,
+        baseline_snapshots=baseline_snapshots if args.baseline else None,
+        baseline_source=str(Path(args.baseline)) if args.baseline else None,
+        current_source=str(Path(args.current)),
+    )
+    report.errors.extend(errors)
+
+    if args.format == "json":
+        output = report_to_json(report, pretty=args.pretty)
+    else:
+        output = report_to_text(report)
+
+    if args.output:
+        Path(args.output).write_text(output, encoding="utf-8")
+    else:
+        sys.stdout.write(output)
+
+    if args.fail_on:
+        threshold = Severity.from_string(args.fail_on)
+        if report.has_severity_at_or_above(threshold):
+            return 2
+    if report.errors:
+        return 1
