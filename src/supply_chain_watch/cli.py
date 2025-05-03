@@ -113,3 +113,13 @@ def cmd_scan(args: argparse.Namespace) -> int:
             return 2
     if report.errors:
         return 1
+    return 0
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.command == "scan":
+        return cmd_scan(args)
+    parser.print_help()
+    return 1
