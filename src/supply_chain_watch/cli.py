@@ -123,3 +123,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_scan(args)
     parser.print_help()
     return 1
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())
