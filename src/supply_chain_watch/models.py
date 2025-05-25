@@ -55,3 +55,17 @@ def _normalize_maintainer(entry: Any) -> dict[str, str]:
             return {}
         return {"name": name, "email": email}
     return {}
+
+
+def _normalize_maintainers(value: Any) -> list[dict[str, str]]:
+    if value is None:
+        return []
+    if isinstance(value, (str, dict)):
+        items = [value]
+    elif isinstance(value, list):
+        items = value
+    else:
+        return []
+    normalized: list[dict[str, str]] = []
+    seen_emails: set[str] = set()
+    seen_names: set[str] = set()
