@@ -69,3 +69,53 @@ def _normalize_maintainers(value: Any) -> list[dict[str, str]]:
     normalized: list[dict[str, str]] = []
     seen_emails: set[str] = set()
     seen_names: set[str] = set()
+    for item in items:
+        maintainer = _normalize_maintainer(item)
+        if not maintainer:
+            continue
+        email = maintainer.get("email", "").lower()
+        name = maintainer.get("name", "").lower()
+        if email:
+            if email in seen_emails:
+                continue
+            seen_emails.add(email)
+        else:
+            if not name or name in seen_names:
+                continue
+            seen_names.add(name)
+        normalized.append(maintainer)
+    return normalized
+
+
+def _normalize_dependencies(value: Any) -> dict[str, str]:
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        result: dict[str, str] = {}
+        for name, spec in value.items():
+            key = str(name).strip()
+            if not key:
+                continue
+            result[key] = str(spec).strip() if spec is not None else ""
+        return result
+    if isinstance(value, list):
+        result = {}
+        for item in value:
+            if isinstance(item, str):
+                name = item.strip()
+                if not name:
+                    continue
+                # simple forms: "pkg==1.0", "pkg>=1", or just "pkg"
+                for sep in ("===", "==", ">=", "<=", "~=", "!=", ">", "<"):
+                    if sep in name:
+                        pkg, _, spec = name.partition(sep)
+                        result[pkg.strip()] = f"{sep}{spec.strip()}"
+                        break
+                else:
+                    result[name] = ""
+            elif isinstance(item, dict):
+                name = str(item.get("name", "")).strip()
+                spec = str(item.get("version", item.get("spec", ""))).strip()
+                if name:
+                    result[name] = spec
+        return result
