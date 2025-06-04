@@ -119,3 +119,16 @@ def _normalize_dependencies(value: Any) -> dict[str, str]:
                 if name:
                     result[name] = spec
         return result
+    return {}
+
+
+def _normalize_scripts(value: Any) -> dict[str, str]:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, str] = {}
+    for name, command in value.items():
+        key = str(name).strip()
+        if not key:
+            continue
+        result[key] = str(command).strip() if command is not None else ""
+    return result
