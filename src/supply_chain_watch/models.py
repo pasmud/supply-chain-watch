@@ -132,3 +132,15 @@ def _normalize_scripts(value: Any) -> dict[str, str]:
             continue
         result[key] = str(command).strip() if command is not None else ""
     return result
+
+
+def _normalize_string(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+@dataclass
+class PackageSnapshot:
+    """Normalized package metadata snapshot."""
