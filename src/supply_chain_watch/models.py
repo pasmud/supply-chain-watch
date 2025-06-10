@@ -144,3 +144,9 @@ def _normalize_string(value: Any) -> str | None:
 @dataclass
 class PackageSnapshot:
     """Normalized package metadata snapshot."""
+
+    name: str
+    version: str | None = None
+    license: str | None = None
+    repository: str | None = None
+    homepage: str | None = None
