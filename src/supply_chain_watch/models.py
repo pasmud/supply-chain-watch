@@ -150,3 +150,8 @@ class PackageSnapshot:
     license: str | None = None
     repository: str | None = None
     homepage: str | None = None
+    description: str | None = None
+    maintainers: list[dict[str, str]] = field(default_factory=list)
+    dependencies: dict[str, str] = field(default_factory=dict)
+    scripts: dict[str, str] = field(default_factory=dict)
+    source: str | None = None
