@@ -155,3 +155,50 @@ class PackageSnapshot:
     dependencies: dict[str, str] = field(default_factory=dict)
     scripts: dict[str, str] = field(default_factory=dict)
     source: str | None = None
+    raw: dict[str, Any] = field(default_factory=dict, repr=False)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any], source: str | None = None) -> "PackageSnapshot":
+        if not isinstance(data, dict):
+            raise ValueError("package snapshot must be an object")
+        name = _normalize_string(data.get("name"))
+        if not name:
+            raise ValueError("package snapshot missing required 'name' field")
+        repository = _normalize_string(
+            data.get("repository")
+            if not isinstance(data.get("repository"), dict)
+            else data.get("repository", {}).get("url")
+        )
+        return cls(
+            name=name,
+            version=_normalize_string(data.get("version")),
+            license=_normalize_string(data.get("license")),
+            repository=repository,
+            homepage=_normalize_string(data.get("homepage")),
+            description=_normalize_string(data.get("description")),
+            maintainers=_normalize_maintainers(data.get("maintainers")),
+            dependencies=_normalize_dependencies(data.get("dependencies")),
+            scripts=_normalize_scripts(data.get("scripts")),
+            source=source,
+            raw=dict(data),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "version": self.version,
+            "license": self.license,
+            "repository": self.repository,
+            "homepage": self.homepage,
+            "description": self.description,
+            "maintainers": self.maintainers,
+            "dependencies": self.dependencies,
+            "scripts": self.scripts,
+        }
+
+
+@dataclass
+class Finding:
+    """A detected supply-chain indicator."""
+
+    rule_id: str
