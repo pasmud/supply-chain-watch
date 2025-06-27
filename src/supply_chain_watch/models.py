@@ -202,3 +202,7 @@ class Finding:
     """A detected supply-chain indicator."""
 
     rule_id: str
+    severity: Severity
+    package: str
+    message: str
+    details: dict[str, Any] = field(default_factory=dict)
