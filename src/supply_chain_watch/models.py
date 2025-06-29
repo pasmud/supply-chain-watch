@@ -206,3 +206,21 @@ class Finding:
     package: str
     message: str
     details: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "rule_id": self.rule_id,
+            "severity": self.severity.value,
+            "package": self.package,
+            "message": self.message,
+            "details": self.details,
+        }
+
+
+@dataclass
+class ScanReport:
+    """Report produced by a scan."""
+
+    packages_scanned: list[str]
+    findings: list[Finding] = field(default_factory=list)
+    baseline_source: str | None = None
