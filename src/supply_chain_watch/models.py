@@ -224,3 +224,23 @@ class ScanReport:
     packages_scanned: list[str]
     findings: list[Finding] = field(default_factory=list)
     baseline_source: str | None = None
+    current_source: str | None = None
+    errors: list[str] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return not self.findings and not self.errors
+
+    def summary(self) -> dict[str, Any]:
+        counts = {severity.value: 0 for severity in Severity}
+        for finding in self.findings:
+            counts[finding.severity.value] += 1
+        return {
+            "packages_scanned": len(self.packages_scanned),
+            "findings": len(self.findings),
+            "errors": len(self.errors),
+            "severity_counts": counts,
+        }
+
+    def has_severity_at_or_above(self, threshold: Severity) -> bool:
+        return any(f.severity.rank >= threshold.rank for f in self.findings)
