@@ -244,3 +244,13 @@ class ScanReport:
 
     def has_severity_at_or_above(self, threshold: Severity) -> bool:
         return any(f.severity.rank >= threshold.rank for f in self.findings)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "baseline_source": self.baseline_source,
+            "current_source": self.current_source,
+            "packages_scanned": self.packages_scanned,
+            "summary": self.summary(),
+            "findings": [f.to_dict() for f in self.findings],
+            "errors": self.errors,
+        }
