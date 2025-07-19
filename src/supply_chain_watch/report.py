@@ -36,3 +36,36 @@ def report_to_text(report: ScanReport) -> str:
     if report.current_source:
         lines.append(f"Current:  {report.current_source}")
     lines.append("")
+
+    summary = report.summary()
+    counts = summary["severity_counts"]
+    lines.append("Summary")
+    lines.append("-------")
+    lines.append(f"Findings: {summary['findings']}")
+    lines.append(f"Errors:   {summary['errors']}")
+    lines.append(
+        "Severity: "
+        + ", ".join(f"{level}={counts[level]}" for level in ["critical", "high", "medium", "low"])
+    )
+    lines.append("")
+
+    if report.errors:
+        lines.append("Errors")
+        lines.append("------")
+        for err in report.errors:
+            lines.append(f"- {err}")
+        lines.append("")
+
+    if report.findings:
+        lines.append("Findings")
+        lines.append("--------")
+        for finding in report.findings:
+            lines.append(
+                f"[{_severity_label(finding.severity)}] {finding.rule_id} {finding.package}: {finding.message}"
+            )
+            for key, value in finding.details.items():
+                lines.append(f"  - {key}: {value}")
+        lines.append("")
+    else:
+        lines.append("No findings detected.")
+        lines.append("")
