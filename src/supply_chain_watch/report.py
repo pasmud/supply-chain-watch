@@ -69,3 +69,5 @@ def report_to_text(report: ScanReport) -> str:
     else:
         lines.append("No findings detected.")
         lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n"
