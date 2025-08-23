@@ -70,3 +70,37 @@ class ScanSnapshotTests(unittest.TestCase):
         missing = [f for f in report.findings if f.rule_id == "MISSING_METADATA"]
         self.assertEqual(len(missing), 1)
         self.assertIn("repository", missing[0].details["missing_fields"])
+
+
+class CompareSnapshotsTests(unittest.TestCase):
+    def test_maintainer_change(self) -> None:
+        base = snap({"name": "pkg", "maintainers": [{"email": "a@example.com"}]})
+        curr = snap({"name": "pkg", "maintainers": [{"email": "b@example.com"}]})
+        findings = compare_snapshots(base, curr)
+        self.assertTrue(any(f.rule_id == "MAINTAINER_CHANGE" for f in findings))
+
+    def test_dependency_added_and_changed(self) -> None:
+        base = snap({"name": "pkg", "dependencies": {"left-pad": "1.0.0"}})
+        curr = snap(
+            {"name": "pkg", "dependencies": {"left-pad": "2.0.0", "evil": "0.1.0"}}
+        )
+        findings = compare_snapshots(base, curr)
+        ids = {f.rule_id for f in findings}
+        self.assertIn("DEPENDENCY_ADDED", ids)
+        self.assertIn("DEPENDENCY_CHANGED", ids)
+
+    def test_repository_change(self) -> None:
+        base = snap({"name": "pkg", "repository": "https://github.com/a/pkg"})
+        curr = snap({"name": "pkg", "repository": "https://github.com/b/pkg"})
+        findings = compare_snapshots(base, curr)
+        repo = [f for f in findings if f.rule_id == "REPOSITORY_CHANGED"]
+        self.assertEqual(len(repo), 1)
+        self.assertEqual(repo[0].severity, Severity.HIGH)
+
+    def test_script_added_lifecycle(self) -> None:
+        base = snap({"name": "pkg", "scripts": {}})
+        curr = snap({"name": "pkg", "scripts": {"preinstall": "node ./setup.js"}})
+        findings = compare_snapshots(base, curr)
+        added = [f for f in findings if f.rule_id == "SCRIPT_ADDED"]
+        self.assertEqual(len(added), 1)
+        self.assertEqual(added[0].severity, Severity.HIGH)
