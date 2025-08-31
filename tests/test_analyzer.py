@@ -125,3 +125,7 @@ class AnalyzeSnapshotsTests(unittest.TestCase):
         )
         self.assertTrue(report.findings)
         self.assertIsNone(report.baseline_source)
+
+
+if __name__ == "__main__":
+    unittest.main()
