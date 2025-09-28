@@ -112,3 +112,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         payload = json.loads(result.stdout)
         self.assertIn("error", payload)
+
+
+if __name__ == "__main__":
+    unittest.main()
