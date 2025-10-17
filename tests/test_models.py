@@ -49,3 +49,33 @@ class PackageSnapshotTests(unittest.TestCase):
     def test_from_dict_requires_name(self) -> None:
         with self.assertRaises(ValueError):
             PackageSnapshot.from_dict({"version": "1.0.0"})
+
+    def test_from_dict_rejects_non_object(self) -> None:
+        with self.assertRaises(ValueError):
+            PackageSnapshot.from_dict(["not", "an", "object"])  # type: ignore[arg-type]
+
+    def test_to_dict_round_trip_shape(self) -> None:
+        snapshot = PackageSnapshot.from_dict({"name": "pkg", "version": "0.1.0"})
+        data = snapshot.to_dict()
+        self.assertEqual(data["name"], "pkg")
+        self.assertEqual(data["version"], "0.1.0")
+        self.assertIn("dependencies", data)
+
+
+class ScanReportTests(unittest.TestCase):
+    def test_summary_counts(self) -> None:
+        report = ScanReport(packages_scanned=["a", "b"])
+        report.findings.append(
+            Finding(rule_id="R1", severity=Severity.HIGH, package="a", message="m")
+        )
+        report.findings.append(
+            Finding(rule_id="R2", severity=Severity.LOW, package="b", message="m")
+        )
+        summary = report.summary()
+        self.assertEqual(summary["packages_scanned"], 2)
+        self.assertEqual(summary["findings"], 2)
+        self.assertEqual(summary["severity_counts"]["high"], 1)
+        self.assertEqual(summary["severity_counts"]["low"], 1)
+        self.assertFalse(report.ok)
+        self.assertTrue(report.has_severity_at_or_above(Severity.HIGH))
+        self.assertFalse(report.has_severity_at_or_above(Severity.CRITICAL))
