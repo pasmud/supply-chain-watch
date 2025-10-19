@@ -79,3 +79,7 @@ class ScanReportTests(unittest.TestCase):
         self.assertFalse(report.ok)
         self.assertTrue(report.has_severity_at_or_above(Severity.HIGH))
         self.assertFalse(report.has_severity_at_or_above(Severity.CRITICAL))
+
+
+if __name__ == "__main__":
+    unittest.main()
