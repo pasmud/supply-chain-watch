@@ -22,3 +22,6 @@ For machine-readable output:
 PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --format json --pretty
 ```
 
+The demo should report findings including a maintainer change, dependency
+changes, an added lifecycle script with a suspicious download command, and a new
+package appearing in the current snapshot.
