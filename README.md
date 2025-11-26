@@ -39,3 +39,15 @@ Python 3.10+ is supported.
 
 ## Quick start
 
+Scan a current snapshot with a baseline and emit text output:
+
+```bash
+PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --format text
+```
+
+Emit JSON (useful for automation):
+
+```bash
+PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --format json --pretty
+```
+
