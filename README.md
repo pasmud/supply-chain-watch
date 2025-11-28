@@ -51,3 +51,18 @@ Emit JSON (useful for automation):
 PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --format json --pretty
 ```
 
+Fail the command when findings meet or exceed a severity threshold:
+
+```bash
+PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --fail-on high
+```
+
+Exit codes:
+- `0` — scan completed; no errors and no threshold-triggering findings
+- `1` — input/load/report error
+- `2` — at least one finding met or exceeded `--fail-on`
+
+## Snapshot format
+
+Input files are JSON. The tool accepts:
+
