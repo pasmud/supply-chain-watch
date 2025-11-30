@@ -66,3 +66,34 @@ Exit codes:
 
 Input files are JSON. The tool accepts:
 
+- a single package object
+- a list of package objects
+- an object with a `"packages"` list
+
+Example package object:
+
+```json
+{
+  "name": "acme-utils",
+  "version": "2.5.0",
+  "license": "MIT",
+  "repository": "https://github.com/acme/acme-utils",
+  "homepage": "https://acme.dev/acme-utils",
+  "maintainers": [
+    {"name": "Alice", "email": "alice@acme.dev"}
+  ],
+  "dependencies": {
+    "requests": "==2.32.0"
+  },
+  "scripts": {
+    "postinstall": "node setup.js"
+  }
+}
+```
+
+Notes:
+- `repository` may be a string or an object containing `url`.
+- `maintainers` may be strings (`"Alice <alice@example.com>"`), objects, or a
+  mix.
+- `dependencies` may be an object map or a list of requirement-like strings.
+
