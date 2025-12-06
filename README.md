@@ -97,3 +97,24 @@ Notes:
   mix.
 - `dependencies` may be an object map or a list of requirement-like strings.
 
+## Architecture / behavior
+
+The package is organized as a small pipeline:
+
+1. **Model normalization (`models.py`)**  
+   Parses raw JSON objects into `PackageSnapshot` dataclasses. Normalization
+   keeps comparisons deterministic (maintainer identity de-duplication,
+   dependency/script mapping, repository URL extraction).
+
+2. **Analysis (`analyzer.py`)**  
+   Performs two classes of checks:
+   - *Single-snapshot checks*: suspicious script patterns and missing metadata.
+   - *Diff checks* (when `--baseline` is provided): maintainer identity changes,
+     dependency add/remove/change, script add/change, repository/homepage/license
+     changes, version changes, and package appearance/removal.
+
+3. **Reporting (`report.py`)**  
+   Converts findings into a machine-readable JSON structure or a human-readable
+   text report. Reports include summary severity counts and detailed finding
+   metadata.
+
