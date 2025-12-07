@@ -118,3 +118,28 @@ The package is organized as a small pipeline:
    text report. Reports include summary severity counts and detailed finding
    metadata.
 
+4. **CLI (`cli.py`, `__main__.py`)**  
+   Exposes the `scan` command and exit-code behavior for local use and CI.
+
+### Rule IDs
+
+| Rule ID | Meaning | Typical severity |
+|---|---|---|
+| `SUSPICIOUS_SCRIPT` | Script contains risky command pattern | medium–critical |
+| `MISSING_METADATA` | Missing repository/license/maintainers | low |
+| `MAINTAINER_CHANGE` | Maintainer identities added/removed | medium/high |
+| `MAINTAINERS_REMOVED` | All maintainers removed | high |
+| `DEPENDENCY_ADDED` | New dependency appeared | medium |
+| `DEPENDENCY_REMOVED` | Dependency removed | low |
+| `DEPENDENCY_CHANGED` | Dependency spec/version changed | medium |
+| `SCRIPT_ADDED` | Script added (lifecycle scripts higher) | medium/high |
+| `SCRIPT_CHANGED` | Script command changed | medium/high |
+| `REPOSITORY_CHANGED` | Repository URL changed | high |
+| `HOMEPAGE_CHANGED` | Homepage URL changed | medium |
+| `LICENSE_CHANGED` | License changed | medium |
+| `VERSION_CHANGED` | Version changed | low |
+| `NEW_PACKAGE` | Package in current but not baseline | medium |
+| `PACKAGE_REMOVED` | Package in baseline but not current | low |
+
+## Development
+
