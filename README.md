@@ -143,3 +143,17 @@ The package is organized as a small pipeline:
 
 ## Development
 
+Run tests:
+
+```bash
+PYTHONPATH=src python -m unittest discover -v
+```
+
+Or with pytest (if installed):
+
+```bash
+PYTHONPATH=src python -m pytest -q
+```
+
+Run the demo:
+
