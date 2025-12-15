@@ -157,3 +157,22 @@ PYTHONPATH=src python -m pytest -q
 
 Run the demo:
 
+```bash
+PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baseline examples/baseline.json --format text
+```
+
+## Limitations
+
+- **Snapshot-based, not a registry client.** The tool does not fetch data from
+  PyPI/npm/etc. You provide the metadata snapshots.
+- **Heuristic indicators, not proof of compromise.** Findings are risk signals
+  that should be reviewed in context.
+- **No transitive dependency resolution.** Only metadata present in snapshots is
+  analyzed.
+- **Script analysis is pattern-based.** Obfuscated or novel malicious commands
+  may evade simple pattern checks; benign commands may occasionally match.
+- **Identity comparison is normalized but simple.** Maintainer matching is based
+  on normalized email/name identities, not cryptographic identity proof.
+
+## License
+
