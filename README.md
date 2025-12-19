@@ -176,3 +176,4 @@ PYTHONPATH=src python -m supply_chain_watch scan examples/current.json --baselin
 
 ## License
 
+MIT. See [`LICENSE`](LICENSE).
